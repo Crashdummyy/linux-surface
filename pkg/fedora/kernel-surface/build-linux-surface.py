@@ -19,7 +19,7 @@ PACKAGE_NAME = "surface"
 ## Fedora tags: kernel-X.Y.Z
 ## Upstream tags: vX.Y.Z
 ##
-PACKAGE_TAG = "kernel-6.16.11-0"
+PACKAGE_TAG = "kernel-6.18.0-2"
 
 ##
 ## The release number of the modified kernel package.
