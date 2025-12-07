@@ -5,6 +5,10 @@ env:
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "master"
+      - "v*"
 
 jobs:
   build:
@@ -20,7 +24,7 @@ jobs:
           remove-docker-images: true
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize containers
         run: |
@@ -39,12 +43,24 @@ jobs:
 
       - name: List rpms
         run: |
-          ls pkg/fedora/kernel-surface/srpm || true
-          ls pkg/fedora/kernel-surface/out
-          ls pkg/fedora/kernel-surface/out/x86_64
+          ls "./pkg/fedora/kernel-surface/srpm"
+          echo "---------------------------------"
+          ls "./pkg/fedora/kernel-surface/out/x86_64"
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: fedora-${{ env.FEDORA }}-latest
-          path: pkg/fedora/kernel-surface/out/x86_64
+      - name: Create github release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd "./pkg/fedora/kernel-surface"
+          version="$(grep -i '^PACKAGE_TAG =' build-linux-surface.py | awk '{print $3}')" | tr -d '"'
+          gh release create "$version" -t "$version" --repo="${{ github.repository }}" --target="${{ github.sha }}" --generate-notes ./srpm/*.src.rpm ./out/x86_64/*.rpm
+
+      - name: Install copr-cli
+        run: dnf install copr-cli -y
+
+      - name: Add login to copr
+        run: |
+          echo "${{ secrets.COPR_CREDENTIALS }}" >> "./coprConfig"
+
+      - name: Upload to COPR
+        run: copr-cli --config "./coprConfig" build LinuxSurface ./pkg/fedora/kernel-surface/srpm/*.src.rpm
