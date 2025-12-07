@@ -42,8 +42,9 @@ index 33418dd6768a..e01ffe97f2e4 100644
 @@ -482,14 +490,13 @@ static ssize_t ac_status_show(struct device *dev, struct device_attribute *attr,
  static DEVICE_ATTR_RW(ac_status);
 
- static struct attribute *acpi_tad_attrs[] = {
+-static struct attribute *acpi_tad_attrs[] = {
 -	&dev_attr_caps.attr,
++static struct attribute *acpi_tad_ac_attrs[] = {
  	&dev_attr_ac_alarm.attr,
  	&dev_attr_ac_policy.attr,
  	&dev_attr_ac_status.attr,
