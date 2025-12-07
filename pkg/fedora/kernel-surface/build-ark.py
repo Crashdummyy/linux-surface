@@ -101,24 +101,12 @@ outdir = os.path.realpath(args.outdir)
 
 # Clone the kernel-ark repository if it doesn't exist.
 if not os.path.exists(args.ark_dir):
-    system("git clone --depth 1 --branch '%s' '%s' '%s'" % (args.package_tag, args.ark_url, args.ark_dir))
-else:
-    # If the repo already exists, fetch only the requested ref shallowly.
-    # This avoids pulling the whole history and keeps fetch time low.
-    # We do this in the existing directory, then continue below.
-    os.chdir(args.ark_dir)
-    system("git fetch --depth 1 origin '%s'" % args.package_tag)
-    # Return to the caller directory so the following os.chdir(args.ark_dir) works uniformly.
-    os.chdir("..")
+    system("git clone '%s' '%s'" % (args.ark_url, args.ark_dir))
 
 os.chdir(args.ark_dir)
 
 # Check out the requested tag.
-try:
-    system("git fetch --tags --depth=1")
-except subprocess.CalledProcessError:
-    system("git fetch --tags")
-
+system("git fetch --tags")
 system("git clean -dfx")
 system("git checkout -b 'build/%s'" % time.time())
 system("git reset --hard '%s'" % args.package_tag)
