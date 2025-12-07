@@ -50,7 +50,7 @@ jobs:
           echo "------------------------"
           ls out/x86_64
           version="$(grep -i '^PACKAGE_TAG =' build-linux-surface.py | awk '{print $3}')" | tr -d '"'
-          gh release create "$version" -t "$version" --repo="${{ github.repository }}" --target="${{ github.sha }}" --generate-notes ./out/*.src.rpm ./out/x86_64/*.rpm ./out/noarch/*.rpm
+          gh release create "$version" -t "$version" --repo="${{ github.repository }}" --target="${{ github.sha }}" --generate-notes ./srpm/*.src.rpm ./out/x86_64/*.rpm ./out/noarch/*.rpm
 
       - name: Install copr-cli
         run: dnf install copr-cli -y
@@ -60,6 +60,6 @@ jobs:
           echo "${{ secrets.COPR_CREDENTIALS }}" >> "./coprConfig"
 
       - name: Upload to COPR
-        run: copr-cli --config "./coprConfig" build LinuxSurface ./pkg/fedora/out/*.src.rpm
+        run: copr-cli --config "./coprConfig" build LinuxSurface ./pkg/fedora/kernel-surface/srpm/*.src.rpm
 
 
