@@ -52,8 +52,27 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd "./pkg/fedora/kernel-surface"
-          version="$(grep -i '^PACKAGE_TAG =' build-linux-surface.py | awk '{print $3}' | tr -d '"')" 
+          version="$(grep -i '^PACKAGE_TAG =' build-linux-surface.py | awk '{print $3}' | tr -d '"')"
           gh release create "$version" -t "$version" --repo="${{ github.repository }}" --target="${{ github.sha }}" --generate-notes ./srpm/*.src.rpm ./out/x86_64/*.rpm
+
+      - name: Upload src.rpm artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: srcrpm
+          path: /pkg/fedora/kernel-surface/srpm/*.src.rpm
+
+  upload:
+    name: Upload to Copr
+    needs: [build]
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/fedora/fedora:43
+
+    steps:
+      - name: Download src.rpm
+        uses: actions/download-artifact@v5
+        with:
+          name: srcrpm
 
       - name: Install copr-cli
         run: dnf install copr-cli -y
@@ -63,4 +82,4 @@ jobs:
           echo "${{ secrets.COPR_CREDENTIALS }}" >> "./coprConfig"
 
       - name: Upload to COPR
-        run: copr-cli --config "./coprConfig" build LinuxSurface ./pkg/fedora/kernel-surface/srpm/*.src.rpm
+        run: copr-cli --config "./coprConfig" build LinuxSurface ./*.src.rpm
