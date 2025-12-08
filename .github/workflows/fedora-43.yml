@@ -52,7 +52,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd "./pkg/fedora/kernel-surface"
-          version="$(grep -i '^PACKAGE_TAG =' build-linux-surface.py | awk '{print $3}')" | tr -d '"'
+          version="$(grep -i '^PACKAGE_TAG =' build-linux-surface.py | awk '{print $3}' | tr -d '"')" 
           gh release create "$version" -t "$version" --repo="${{ github.repository }}" --target="${{ github.sha }}" --generate-notes ./srpm/*.src.rpm ./out/x86_64/*.rpm
 
       - name: Install copr-cli
