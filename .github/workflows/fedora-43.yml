@@ -82,4 +82,6 @@ jobs:
           echo "${{ secrets.COPR_CREDENTIALS }}" >> "./coprConfig"
 
       - name: Upload to COPR
-        run: copr-cli --config "./coprConfig" build LinuxSurface ./*.src.rpm
+        run: |
+          nohup copr-cli --config "./coprConfig" build LinuxSurface ./*.src.rpm &
+          disown
