@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: srcrpm
-          path: /pkg/fedora/kernel-surface/srpm/*.src.rpm
+          path: ./pkg/fedora/kernel-surface/srpm/*.src.rpm
 
   upload:
     name: Upload to Copr
@@ -84,4 +84,5 @@ jobs:
       - name: Upload to COPR
         run: |
           nohup copr-cli --config "./coprConfig" build LinuxSurface ./*.src.rpm &
+          sleep 20
           disown
